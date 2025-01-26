@@ -1,6 +1,0 @@
-2025-01-26T19:19:12Z ::: start workers;
-	context item (0): *workers.Pool, &{Workres:[] WorkersNumber:10 InputGate:0xc0001001c0 messageHandler:0x4ed660};
-		where: /home/senior/Documents/GitHub/wow/tests/go/internal/pkg/transport/workers/pool.go, line: 45;
-2025-01-26T19:19:12Z ::: start workers : done;
-	context item (0): *workers.Pool, &{Workres:[0xc0000740c0 0xc000074100 0xc000074140 0xc000074180 0xc0000741c0 0xc000074240 0xc000074280 0xc0000742c0 0xc000074300 0xc000074340] WorkersNumber:10 InputGate:0xc0001001c0 messageHandler:0x4ed660};
-		where: /home/senior/Documents/GitHub/wow/tests/go/internal/pkg/transport/workers/pool.go, line: 60;

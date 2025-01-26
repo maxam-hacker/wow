@@ -4,8 +4,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
-	"wow/internal/pkg/logs"
 )
 
 func main() {
@@ -13,6 +11,4 @@ func main() {
 	signal.Notify(stdin, syscall.SIGINT, syscall.SIGTERM)
 
 	<-stdin
-
-	logs.MainLogger.Print("exit")
 }

@@ -2,9 +2,11 @@ package logs
 
 import "wow/pkg/logger"
 
-var baseLogsPath = "./wow.logs"
+var baseLogsPath = "./.wow.logs"
 
-var MainLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("main")
+var MainClientLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("main").WithSecondPrefix("client")
+
+var MainServerLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("main").WithSecondPrefix("server")
 
 var ServerLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("server")
 

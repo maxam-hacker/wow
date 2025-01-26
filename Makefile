@@ -1,10 +1,3 @@
-install:
-	go mod download
-
-test:
-	go clean --testcache
-	go test ./...
-
 server:
 	go run cmd/server/main.go
 

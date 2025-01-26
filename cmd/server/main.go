@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	logs.MainLogger.Print("start")
+	logs.MainServerLogger.Print("start")
 
 	storage.Initialize("")
 
@@ -40,7 +40,7 @@ func main() {
 		return
 	}
 
-	logs.MainLogger.Print("server has started")
+	logs.MainServerLogger.Print("server has started")
 
 	stdin := make(chan os.Signal, 1)
 	signal.Notify(stdin, syscall.SIGINT, syscall.SIGTERM)
@@ -49,5 +49,5 @@ func main() {
 
 	s.Stop()
 
-	logs.MainLogger.Print("exit")
+	logs.MainServerLogger.Print("exit")
 }

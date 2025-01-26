@@ -45,7 +45,7 @@ func main() {
 
 	go c.Loop()
 
-	logs.MainLogger.Print("client has started")
+	logs.MainClientLogger.Print("client has started")
 
 	stdin := make(chan os.Signal, 1)
 	signal.Notify(stdin, syscall.SIGINT, syscall.SIGTERM)
@@ -71,13 +71,13 @@ func (c *Client) RxHandler(responseBytes []byte) error {
 	}
 
 	if response.Type == proto.ResponseOnActionType {
-		logs.MainLogger.PrintWithContext("action", logger.Context{
+		logs.MainClientLogger.PrintWithContext("action", logger.Context{
 			"response:": response,
 		})
 
 		hash, err := response.Hash.Compute(10000000)
 		if err != nil {
-			logs.MainLogger.PrintWithContext("can't compute hashcash", logger.Context{
+			logs.MainClientLogger.PrintWithContext("can't compute hashcash", logger.Context{
 				"error":     err,
 				"response:": response,
 			})
@@ -91,14 +91,14 @@ func (c *Client) RxHandler(responseBytes []byte) error {
 
 		c.lineCounter %= c.MaxLines
 
-		logs.MainLogger.PrintWithContext("execution", logger.Context{
+		logs.MainClientLogger.PrintWithContext("execution", logger.Context{
 			"LineId:":    response.LineId,
 			"LineValue:": response.Result,
 		})
 
 	} else {
 		err = ErrUnknownResponse
-		logs.MainLogger.PrintWithContext("can't handle response", logger.Context{
+		logs.MainClientLogger.PrintWithContext("can't handle response", logger.Context{
 			"error":     err,
 			"response:": response,
 		})

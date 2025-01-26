@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: build/docker/client/Dockerfile
+    image: maxam-hacker/wow/client:latest
+    environment:
+      SERVICE_HOST: "server"
+      SERVICE_PORT: '9877'
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: .
+      dockerfile: build/docker/server/Dockerfile
+    image: maxam-hacker/wow/server:latest
+    environment:
+      SERVICE_HOST: "0.0.0.0"
+      SERVICE_PORT: '9877'
+    ports:
+      - '9877:9877'
+
+  tester:
+    build:
+      context: .
+      dockerfile: build/docker/tester/Dockerfile
+    image: maxam-hacker/wow/tester:latest
+    environment:
+      SERVICE_HOST: "server"
+      SERVICE_PORT: '9877'
+    depends_on:
+      - server
+      - client

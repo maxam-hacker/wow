@@ -1,0 +1,29 @@
+{
+    "server": {
+        "host": "0.0.0.0",
+        "port": 9877,
+        "workers": 10
+    },
+
+    "epoll": {
+        "loopTimeOut": 5000,
+        "eventsBufferSize": 128,
+        "cleanerPeriod": 30,
+        "cleanerConnectionsThreshold": 800000,
+        "cleanerTimeThreshold": 180
+    },
+
+    "workLoadBalancer": {
+        "minZeros": 1,
+        "threshold1Connections": 1000,
+        "threshold1Zeros": 2,
+        "threshold2Connections": 1000,
+        "threshold2Zeros": 3,
+        "threshold3Connections": 1000,
+        "threshold3Zeros": 4
+    },
+
+    "storage": {
+        "pathToBook": "./book.txt"
+    }
+}

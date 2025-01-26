@@ -1,0 +1,7 @@
+2025-01-26T18:46:43Z ::: can't calculate workload factor;
+	context item [requestBytes]: []uint8, [123 34 77 101 116 97 34 58 123 34 67 108 105 101 110 116 73 100 34 58 34 50 54 51 102 51 51 56 50 45 51 102 48 50 45 52 99 53 48 45 98 53 56 102 45 49 98 100 99 54 49 101 101 54 56 56 57 34 44 34 67 108 105 101 110 116 86 101 114 115 105 111 110 34 58 34 48 46 48 46 49 34 125 44 34 84 121 112 101 34 58 34 101 120 101 99 117 116 105 111 110 34 44 34 76 105 110 101 73 100 34 58 49 44 34 72 97 115 104 34 58 123 34 86 101 114 115 105 111 110 34 58 49 44 34 68 97 116 101 34 58 48 44 34 82 101 115 111 117 114 99 101 34 58 34 34 44 34 90 101 114 111 115 34 58 49 44 34 82 97 110 100 34 58 34 34 44 34 67 111 117 110 116 101 114 34 58 50 50 125 125];
+	context item [currentWorkLoad]: int, 1;
+	context item [requestAsString]: string, {"Meta":{"ClientId":"263f3382-3f02-4c50-b58f-1bdc61ee6889","ClientVersion":"0.0.1"},"Type":"execution","LineId":1,"Hash":{"Version":1,"Date":0,"Resource":"","Zeros":1,"Rand":"","Counter":22}};
+	context item [error]: *errors.errorString, error in checking number of zeros;
+	context item [workLoadFactor]: int16, 1;
+		where: /home/senior/Documents/GitHub/wow/tests/go/internal/server/server.go, line: 98;

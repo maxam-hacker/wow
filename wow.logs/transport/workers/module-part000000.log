@@ -1,0 +1,4 @@
+2025-01-26T19:19:12Z ::: new workers pool;
+	context item (0): int, 10;
+	context item (1): types.TcpServerMessageHandler, 0x4ed660;
+		where: /home/senior/Documents/GitHub/wow/tests/go/internal/pkg/transport/workers/pool.go, line: 21;

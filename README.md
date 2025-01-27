@@ -29,3 +29,16 @@ If it is planning to use this service in a distributed architecture there will b
 
 More metcis and control algorithms based on it.
 
+More unit and integration tests.
+
+
+### Results
+
+Cliet:
+![alt text](https://github.com/maxam-hacker/wow/docs/images/client.png)
+
+Server:
+![alt text](https://github.com/maxam-hacker/wow/docs/images/server.png)
+
+Net settings:
+![alt text](https://github.com/maxam-hacker/wow/docs/images/net.png)

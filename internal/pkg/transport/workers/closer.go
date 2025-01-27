@@ -10,5 +10,9 @@ func (c *Closer) SetTarget(targetSocketHandler int) {
 }
 
 func (c Closer) Close() error {
-	return c.epCloser(c.targetSocketHandler)
+	if c.epCloser != nil {
+		return c.epCloser(c.targetSocketHandler)
+	}
+
+	return nil
 }

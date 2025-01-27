@@ -29,13 +29,16 @@ type Server struct {
 }
 
 var (
-	ErrUnknownRequest = errors.New("unknown request")
-	ErrValiadionError = errors.New("validation error")
+	ErrEmptyLoadBalancer = errors.New("can't find load balancer algo")
+	ErrEmptyWriter       = errors.New("can't find writer")
+	ErrEmptyCloser       = errors.New("can't find closer")
+	ErrUnknownRequest    = errors.New("unknown request")
+	ErrValiadionError    = errors.New("validation error")
 )
 
 func (server *Server) Start() error {
 	if server.WorkLoadBalancer == nil {
-		return nil
+		return ErrEmptyLoadBalancer
 	}
 
 	server.tcpServer = transport.TcpServer{
@@ -59,6 +62,14 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 		"requestBytes":    requestBytes,
 		"currentWorkLoad": currentWorkLoad,
 		"requestAsString": string(requestBytes),
+	}
+
+	if writer == nil {
+		return ErrEmptyWriter
+	}
+
+	if closer == nil {
+		return ErrEmptyCloser
 	}
 
 	err = json.Unmarshal(requestBytes, &request)

@@ -36,6 +36,7 @@ func main() {
 		lineCounter: 1,
 		tcpClient: client.TcpClient{
 			Host: "127.0.0.1",
+			Port: 9877,
 		},
 	}
 

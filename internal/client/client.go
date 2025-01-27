@@ -22,7 +22,7 @@ var RxBuffer [65536]byte
 func (client *TcpClient) Start() error {
 	var err error
 
-	client.Connection, err = net.Dial("tcp", "127.0.0.1:9876")
+	client.Connection, err = net.Dial("tcp", fmt.Sprintf("%s:%d", client.Host, client.Port))
 	if err != nil {
 		fmt.Println(err)
 		return err

@@ -52,6 +52,7 @@ func (pool *Pool) startWorkers() error {
 			InputGate: pool.InputGate,
 			Buffer:    make([]byte, 65536),
 			Handler:   pool.messageHandler,
+			Cancel:    make(chan struct{}),
 		}
 
 		w.Closer.epCloser = pool.epCloser

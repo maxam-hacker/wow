@@ -64,6 +64,7 @@ func (ep *Epoll) Start() error {
 }
 
 func (ep *Epoll) Stop() {
+	unix.Close(ep.epollHandler)
 }
 
 func (ep *Epoll) initialize() error {
@@ -194,7 +195,7 @@ func (ep *Epoll) loop() {
 				if events&unix.EPOLLIN != 0 {
 					ep.read(fd)
 				} else {
-					logs.EpollLogger.Print("loop: unexpectable behaviour", fd)
+					logs.EpollLogger.Print("unexpectable behaviour", fd)
 					ep.Delete(fd)
 				}
 			}
@@ -260,10 +261,15 @@ func (ep *Epoll) read(targetSocketHandler int) error {
 func (ep *Epoll) Delete(targetSocketHandler int) error {
 	err := unix.EpollCtl(ep.epollHandler, unix.EPOLL_CTL_DEL, targetSocketHandler, nil)
 	if err != nil {
+		logs.EpollLogger.Print("can't delete socket from epoll", targetSocketHandler, err)
 		return err
 	}
 
-	unix.Close(targetSocketHandler)
+	err = unix.Close(targetSocketHandler)
+	if err != nil {
+		logs.EpollLogger.Print("can't close socket conection", targetSocketHandler, err)
+		return err
+	}
 
 	ep.metrics.DecConnections(targetSocketHandler)
 

@@ -7,6 +7,9 @@ client:
 tester:
 	go run cmd/tester/main.go
 
+tests:
+	go test ./...
+
 build:
 	docker compose build 
 

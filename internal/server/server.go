@@ -13,13 +13,21 @@ import (
 )
 
 type Server struct {
-	Host             string
-	Port             int
 	WorkLoadBalancer func(int) (int16, error)
 	tcpServer        transport.TcpServer
+	Opts             ServerOpts
+}
+
+type ServerOpts struct {
+	Host                string
+	Port                int
+	Workres             int
+	CloseAfterAction    bool
+	CloseAfterExecution bool
 }
 
 var (
+	ErrUnknownRequest = errors.New("unknown request")
 	ErrValiadionError = errors.New("validation error")
 )
 
@@ -29,8 +37,8 @@ func (server *Server) Start() error {
 	}
 
 	server.tcpServer = transport.TcpServer{
-		Host:           server.Host,
-		Port:           server.Port,
+		Host:           server.Opts.Host,
+		Port:           server.Opts.Port,
 		MessageHandler: server.messageHandler,
 	}
 
@@ -41,7 +49,7 @@ func (server *Server) Stop() {
 	server.tcpServer.Stop()
 }
 
-func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, currentWorkLoad int) error {
+func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, currentWorkLoad int, closer io.Closer) error {
 	var request proto.Request
 	var err error
 
@@ -55,6 +63,7 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 	if err != nil {
 		errContext["error"] = err
 		logs.ServerLogger.PrintWithContext("unmarshalling error", errContext)
+		closer.Close()
 		return err
 	}
 
@@ -63,6 +72,7 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 		if err != nil {
 			errContext["error"] = err
 			logs.ServerLogger.PrintWithContext("can't calculate workload factor", errContext)
+			closer.Close()
 			return err
 		}
 
@@ -73,6 +83,7 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 			errContext["error"] = err
 			errContext["response"] = response
 			logs.ServerLogger.PrintWithContext("marshalling error", errContext)
+			closer.Close()
 			return err
 		}
 
@@ -81,7 +92,12 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 			errContext["error"] = err
 			errContext["responseBytes"] = responseBytes
 			logs.ServerLogger.PrintWithContext("can't write data", errContext)
+			closer.Close()
 			return err
+		}
+
+		if server.Opts.CloseAfterAction {
+			closer.Close()
 		}
 
 	} else if request.Type == proto.RequestActionExecutionType {
@@ -89,6 +105,7 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 		if err != nil {
 			errContext["error"] = err
 			logs.ServerLogger.PrintWithContext("can't calculate workload factor", errContext)
+			closer.Close()
 			return err
 		}
 
@@ -97,12 +114,14 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 			errContext["error"] = err
 			errContext["workLoadFactor"] = workLoadFactor
 			logs.ServerLogger.PrintWithContext("can't calculate workload factor", errContext)
+			closer.Close()
 			return err
 		}
 
 		if !ok {
 			errContext["workLoadFactor"] = workLoadFactor
 			logs.ServerLogger.PrintWithContext("can't calculate workload factor", errContext)
+			closer.Close()
 			return ErrValiadionError
 		}
 
@@ -113,6 +132,7 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 			errContext["error"] = err
 			errContext["response"] = response
 			logs.ServerLogger.PrintWithContext("marshalling error", errContext)
+			closer.Close()
 			return err
 		}
 
@@ -121,12 +141,18 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 			errContext["error"] = err
 			errContext["responseBytes"] = responseBytes
 			logs.ServerLogger.PrintWithContext("can't write data", errContext)
+			closer.Close()
 			return err
+		}
+
+		if server.Opts.CloseAfterExecution {
+			closer.Close()
 		}
 
 	} else {
 		logs.ServerLogger.PrintWithContext("unknown request", errContext)
-		return errors.New("")
+		closer.Close()
+		return ErrUnknownRequest
 	}
 
 	return nil

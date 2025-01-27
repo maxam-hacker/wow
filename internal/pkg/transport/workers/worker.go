@@ -13,6 +13,7 @@ type Worker struct {
 	Buffer    []byte
 	Handler   types.TcpServerMessageHandler
 	Writer    Writer
+	Closer    Closer
 }
 
 func (worker *Worker) start() {
@@ -27,8 +28,8 @@ func (worker *Worker) start() {
 		if n > 0 {
 			if worker.Handler != nil {
 				worker.Writer.SetTarget(poolMessage.TargetSocketHandler)
-
-				err = worker.Handler(worker.Buffer[0:n], worker.Writer, poolMessage.ConnectionsNum)
+				worker.Closer.SetTarget(poolMessage.TargetSocketHandler)
+				err = worker.Handler(worker.Buffer[0:n], worker.Writer, poolMessage.ConnectionsNum, worker.Closer)
 				if err != nil {
 					unix.Close(poolMessage.TargetSocketHandler)
 				}

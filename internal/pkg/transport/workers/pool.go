@@ -15,6 +15,7 @@ type Pool struct {
 	WorkersNumber  int
 	InputGate      chan PoolMessage
 	messageHandler types.TcpServerMessageHandler
+	epCloser       func(int) error
 }
 
 func New(workersNumber int, messageHandler types.TcpServerMessageHandler) (*Pool, error) {
@@ -26,12 +27,18 @@ func New(workersNumber int, messageHandler types.TcpServerMessageHandler) (*Pool
 		messageHandler: messageHandler,
 	}
 
-	err := wp.startWorkers()
+	return wp, nil
+}
+
+func (pool *Pool) Start(epCloser func(int) error) error {
+	pool.epCloser = epCloser
+
+	err := pool.startWorkers()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return wp, nil
+	return nil
 }
 
 func (pool *Pool) HandleMessage(targetSocketHandler int, connectionsNum int) {
@@ -51,6 +58,8 @@ func (pool *Pool) startWorkers() error {
 			Buffer:    make([]byte, 65536),
 			Handler:   pool.messageHandler,
 		}
+
+		w.Closer.epCloser = pool.epCloser
 
 		pool.Workres = append(pool.Workres, w)
 

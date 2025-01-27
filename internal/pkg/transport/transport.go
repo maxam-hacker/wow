@@ -26,12 +26,6 @@ type TcpServer struct {
 	workers        *workers.Pool
 }
 
-type TcpServerOpts struct {
-	Host    string
-	Port    int
-	Workres int
-}
-
 func (tcpServer *TcpServer) Start() error {
 	var err error
 
@@ -52,6 +46,8 @@ func (tcpServer *TcpServer) Start() error {
 	if err != nil {
 		return err
 	}
+
+	tcpServer.workers.Start(tcpServer.epoll.Delete)
 
 	tcpServer.epoll.Start()
 

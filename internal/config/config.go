@@ -1,13 +1,13 @@
 package config
 
 import (
-	"wow/internal/pkg/transport"
 	"wow/internal/pkg/transport/epoll"
+	"wow/internal/server"
 )
 
 type TcpServerConfiguration struct {
-	TcpServerOpts transport.TcpServerOpts `json:"server"`
-	EpollOpts     epoll.EpollOpts         `json:"epoll"`
+	ServerOpts server.ServerOpts `json:"server"`
+	EpollOpts  epoll.EpollOpts   `json:"epoll"`
 }
 
 func NewTcpServerConfiguration(configPath string) *TcpServerConfiguration {

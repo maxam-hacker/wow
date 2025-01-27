@@ -16,8 +16,13 @@ func main() {
 	storage.Initialize("")
 
 	s := server.Server{
-		Host: "0.0.0.0",
-		Port: 9876,
+		Opts: server.ServerOpts{
+			Host:                "0.0.0.0",
+			Port:                9877,
+			Workres:             10,
+			CloseAfterAction:    false,
+			CloseAfterExecution: false,
+		},
 		WorkLoadBalancer: func(currentWorkLoad int) (int16, error) {
 			if currentWorkLoad > 1000000 {
 				return 4, nil

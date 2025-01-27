@@ -21,33 +21,31 @@ const (
 )
 
 type EpollOpts struct {
-	EpollEventsBufferSize       int
-	EpollLoopWaitTimeout        int
-	CleanerPeriod               int
-	CleanerConnectionsThreshold int
-	CleanerTimeThreshold        int
+	EpollEventsBufferSize       int `json:"eventsBufferSize"`
+	EpollLoopWaitTimeout        int `json:"loopTimeOut"`
+	CleanerPeriod               int `json:"cleanerPeriod"`
+	CleanerConnectionsThreshold int `json:"cleanerConnectionsThreshold"`
+	CleanerTimeThreshold        int `json:"cleanerTimeThreshold"`
 }
 
 type Epoll struct {
-	Host                  string
-	Port                  int
-	EpollEventsBufferSize int
-	EpollLoopWaitTimeout  int
-	epollEventsBuffer     []unix.EpollEvent
-	epollHandler          int
-	socketHandler         int
-	workers               *workers.Pool
-	metrics               metrics.Metrics
+	Host              string
+	Port              int
+	Opts              EpollOpts
+	epollEventsBuffer []unix.EpollEvent
+	epollHandler      int
+	socketHandler     int
+	workers           *workers.Pool
+	metrics           metrics.Metrics
 }
 
-func New(host string, port int, workers *workers.Pool) (*Epoll, error) {
+func New(host string, port int, workers *workers.Pool, opts EpollOpts) (*Epoll, error) {
 	return &Epoll{
-		Host:                  host,
-		Port:                  port,
-		EpollEventsBufferSize: DefaultEpollEventsBufferSize,
-		EpollLoopWaitTimeout:  DefaultEpollLoopWaitTimeout,
-		workers:               workers,
-		metrics:               metrics.Metrics{},
+		Host:    host,
+		Port:    port,
+		Opts:    opts,
+		workers: workers,
+		metrics: metrics.Metrics{},
 	}, nil
 }
 
@@ -81,7 +79,7 @@ func (ep *Epoll) initialize() error {
 		return err
 	}
 
-	ep.epollEventsBuffer = make([]unix.EpollEvent, ep.EpollEventsBufferSize)
+	ep.epollEventsBuffer = make([]unix.EpollEvent, ep.Opts.EpollEventsBufferSize)
 
 	ep.socketHandler, err = unix.Socket(unix.AF_INET, unix.O_NONBLOCK|unix.SOCK_STREAM, 0)
 	if err != nil {
@@ -167,7 +165,7 @@ func (ep *Epoll) loop() {
 	logs.EpollLogger.Print("epoll control loop", ep)
 
 	for {
-		n, err := unix.EpollWait(ep.epollHandler, ep.epollEventsBuffer, ep.EpollLoopWaitTimeout)
+		n, err := unix.EpollWait(ep.epollHandler, ep.epollEventsBuffer, ep.Opts.EpollLoopWaitTimeout)
 		if err == nil {
 			if n == 0 {
 				continue
@@ -278,7 +276,7 @@ func (ep *Epoll) Delete(targetSocketHandler int) error {
 
 func (ep *Epoll) cleaner() {
 	for {
-		time.Sleep(DefaultCleanerPeriod * time.Second)
+		time.Sleep(time.Duration(ep.Opts.CleanerPeriod) * time.Second)
 
 		connectionsNum := ep.metrics.GetConnections()
 
@@ -286,12 +284,12 @@ func (ep *Epoll) cleaner() {
 			"Connections": ep.metrics.GetConnections(),
 		})
 
-		if connectionsNum < DefaultCleanerConnectionsThreshold {
+		if connectionsNum < ep.Opts.CleanerConnectionsThreshold {
 			continue
 		}
 
 		ep.metrics.Walk(func(connectionElement *metrics.ConnectionElement) {
-			if time.Now().UTC().Sub(connectionElement.LastActivity) > DefaultCleanerTimeThreshold*time.Second {
+			if time.Now().UTC().Sub(connectionElement.LastActivity) > time.Duration(ep.Opts.CleanerTimeThreshold)*time.Second {
 				ep.Delete(connectionElement.SocketHandler)
 			}
 		})

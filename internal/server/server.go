@@ -12,18 +12,18 @@ import (
 	"wow/pkg/logger"
 )
 
+type ServerOpts struct {
+	Host                string `json:"host"`
+	Port                int    `json:"port"`
+	Workres             int    `json:"workers"`
+	CloseAfterAction    bool   `json:"closeAfterAction"`
+	CloseAfterExecution bool   `json:"closeAfterExecution"`
+}
+
 type Server struct {
 	WorkLoadBalancer func(int) (int16, error)
 	tcpServer        transport.TcpServer
 	Opts             ServerOpts
-}
-
-type ServerOpts struct {
-	Host                string
-	Port                int
-	Workres             int
-	CloseAfterAction    bool
-	CloseAfterExecution bool
 }
 
 var (
@@ -161,6 +161,7 @@ func (server *Server) messageHandler(requestBytes []byte, writer io.Writer, curr
 func (server *Server) getWorkLoadFactor(currentWorkLoad int) (int16, error) {
 	workLoadFactor, err := server.WorkLoadBalancer(currentWorkLoad)
 	if err != nil {
+		logs.ServerLogger.Print("can't get load factor", err)
 		return 1000, err
 	}
 

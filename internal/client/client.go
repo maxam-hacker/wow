@@ -6,8 +6,10 @@ import (
 	"net"
 
 	"wow/internal/hashcash"
+	"wow/internal/pkg/logs"
 	"wow/internal/proto"
 	"wow/internal/types"
+	"wow/pkg/logger"
 )
 
 type TcpClient struct {
@@ -24,7 +26,7 @@ func (client *TcpClient) Start() error {
 
 	client.Connection, err = net.Dial("tcp", fmt.Sprintf("%s:%d", client.Host, client.Port))
 	if err != nil {
-		fmt.Println(err)
+		logs.ClientLogger.Print("cah't get connection to service", err)
 		return err
 	}
 	defer client.Connection.Close()
@@ -45,7 +47,13 @@ func (client *TcpClient) SetRxHandler(rxHandler types.TcpClientMessageHandler) {
 }
 
 func (client *TcpClient) SendRequestOnAction(clientId string, clientVersion string) (int, error) {
+	erContext := logger.Context{
+		"clinetId":      clientId,
+		"clientVersion": clientVersion,
+	}
+
 	if client.Connection == nil {
+		logs.ClientLogger.PrintWithContext("empty connection", erContext)
 		return 0, nil
 	}
 
@@ -58,6 +66,8 @@ func (client *TcpClient) SendRequestOnAction(clientId string, clientVersion stri
 
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
+		erContext["error"] = err
+		logs.ClientLogger.PrintWithContext("can't marshal request", erContext)
 		return 0, err
 	}
 
@@ -66,7 +76,15 @@ func (client *TcpClient) SendRequestOnAction(clientId string, clientVersion stri
 }
 
 func (client *TcpClient) SendRequestOnActionExecution(clientId string, clientVersion string, hash hashcash.Hashcash, lineId int) (int, error) {
+	erContext := logger.Context{
+		"clinetId":      clientId,
+		"clientVersion": clientVersion,
+		"hash":          hash,
+		"lineId":        lineId,
+	}
+
 	if client.Connection == nil {
+		logs.ClientLogger.PrintWithContext("empty connection", erContext)
 		return 0, nil
 	}
 
@@ -81,6 +99,8 @@ func (client *TcpClient) SendRequestOnActionExecution(clientId string, clientVer
 
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
+		erContext["error"] = err
+		logs.ClientLogger.PrintWithContext("can't marshal request", erContext)
 		return 0, err
 	}
 

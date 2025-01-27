@@ -42,7 +42,15 @@ func (tcpServer *TcpServer) Start() error {
 		return err
 	}
 
-	tcpServer.epoll, err = epoll.New(tcpServer.Host, tcpServer.Port, tcpServer.workers)
+	epollOpts := epoll.EpollOpts{
+		EpollEventsBufferSize:       epoll.DefaultEpollEventsBufferSize,
+		EpollLoopWaitTimeout:        epoll.DefaultEpollLoopWaitTimeout,
+		CleanerPeriod:               epoll.DefaultCleanerPeriod,
+		CleanerConnectionsThreshold: epoll.DefaultCleanerConnectionsThreshold,
+		CleanerTimeThreshold:        epoll.DefaultCleanerTimeThreshold,
+	}
+
+	tcpServer.epoll, err = epoll.New(tcpServer.Host, tcpServer.Port, tcpServer.workers, epollOpts)
 	if err != nil {
 		return err
 	}

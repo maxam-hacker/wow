@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -17,6 +18,8 @@ import (
 )
 
 var (
+	Version = "0.0.1"
+
 	ErrUnknownResponse = errors.New("unknown response")
 )
 
@@ -29,14 +32,28 @@ type Client struct {
 }
 
 func main() {
+	serviceHost := os.Getenv("SERVICE_HOST")
+	if serviceHost == "" {
+		serviceHost = "127.0.0.1"
+	}
+
+	port := os.Getenv("SERVICE_PORT")
+	if port == "" {
+		port = "9877"
+	}
+	servicePort, err := strconv.Atoi(port)
+	if err != nil {
+		logs.MainServerLogger.Print("can't get service port", err)
+	}
+
 	c := &Client{
 		Id:          uuid.NewString(),
-		Version:     "0.0.1",
-		MaxLines:    20,
+		Version:     Version,
+		MaxLines:    6,
 		lineCounter: 1,
 		tcpClient: client.TcpClient{
-			Host: "127.0.0.1",
-			Port: 9877,
+			Host: serviceHost,
+			Port: servicePort,
 		},
 	}
 

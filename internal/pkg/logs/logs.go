@@ -10,6 +10,8 @@ var MainServerLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("main").Wi
 
 var ServerLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("server")
 
+var ClientLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("client")
+
 var TransportLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("transport")
 
 var EpollLogger = logger.NewWithKeeping(baseLogsPath).WithPrefix("transport").WithSecondPrefix("epoll")

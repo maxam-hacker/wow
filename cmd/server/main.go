@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"wow/internal/pkg/logs"
@@ -13,12 +14,26 @@ import (
 func main() {
 	logs.MainServerLogger.Print("start")
 
-	storage.Initialize("")
+	serviceHost := os.Getenv("SERVICE_HOST")
+	if serviceHost == "" {
+		serviceHost = "0.0.0.0"
+	}
+
+	port := os.Getenv("SERVICE_PORT")
+	if port == "" {
+		port = "9877"
+	}
+	servicePort, err := strconv.Atoi(port)
+	if err != nil {
+		logs.MainServerLogger.Print("can't get service port", err)
+	}
+
+	storage.Initialize("./i,robot.txt")
 
 	s := server.Server{
 		Opts: server.ServerOpts{
-			Host:                "0.0.0.0",
-			Port:                9877,
+			Host:                serviceHost,
+			Port:                servicePort,
 			Workres:             10,
 			CloseAfterAction:    false,
 			CloseAfterExecution: false,
@@ -40,7 +55,7 @@ func main() {
 		},
 	}
 
-	err := s.Start()
+	err = s.Start()
 	if err != nil {
 		return
 	}

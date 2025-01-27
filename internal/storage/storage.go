@@ -1,19 +1,33 @@
 package storage
 
-import "sync"
+import (
+	"bufio"
+	"os"
+	"sync"
+)
+
+type StorageOpts struct {
+	PathToBook string `json:"pathToBook"`
+}
 
 var storage sync.Map
 
-func Initialize(pathToBook string) {
-	storage.Store(1, "line 1")
-	storage.Store(2, "line 2")
-	storage.Store(3, "line 3")
-	storage.Store(4, "line 4")
-	storage.Store(5, "line 5")
-	storage.Store(6, "line 6")
-	storage.Store(7, "line 7")
-	storage.Store(8, "line 8")
-	storage.Store(9, "line 9")
+func Initialize(pathToBook string) error {
+	file, err := os.Open(pathToBook)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	idx := 1
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		storage.Store(idx, scanner.Text())
+		idx++
+	}
+
+	return nil
 }
 
 func GetLine(lineId int) string {

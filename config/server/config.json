@@ -2,7 +2,9 @@
     "server": {
         "host": "0.0.0.0",
         "port": 9877,
-        "workers": 10
+        "workers": 10,
+        "closeAfterAction": false,
+        "closeAfterExecution": false
     },
 
     "epoll": {

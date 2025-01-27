@@ -35,10 +35,10 @@ More unit and integration tests.
 ### Results
 
 Cliet:
-![alt text](https://github.com/maxam-hacker/wow/docs/images/client.png)
+![alt text](docs/images/client.png?raw=true)
 
 Server:
-![alt text](https://github.com/maxam-hacker/wow/docs/images/server.png)
+![alt text](docs/images/server.png?raw=true)
 
 Net settings:
-![alt text](https://github.com/maxam-hacker/wow/docs/images/net.png)
+![alt text](docs/images/net.png?raw=true)

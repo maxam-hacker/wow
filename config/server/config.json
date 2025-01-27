@@ -26,6 +26,6 @@
     },
 
     "storage": {
-        "pathToBook": "./book.txt"
+        "pathToBook": "./i,robot.txt"
     }
 }

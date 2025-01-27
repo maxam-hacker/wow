@@ -1,6 +1,8 @@
 package config
 
 import (
+	"encoding/json"
+	"os"
 	"wow/internal/pkg/transport/epoll"
 	"wow/internal/server"
 	"wow/internal/storage"
@@ -14,6 +16,18 @@ type TcpServerConfiguration struct {
 	WorkLoadBalancerOpts types.WorkLoadBalancerOpts `json:"workLoadBalancer"`
 }
 
-func NewTcpServerConfiguration(configPath string) *TcpServerConfiguration {
-	return &TcpServerConfiguration{}
+func NewTcpServerConfiguration(configPath string) (*TcpServerConfiguration, error) {
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	var serverConfig TcpServerConfiguration
+
+	err = json.Unmarshal(data, &serverConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return &serverConfig, nil
 }

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"syscall"
 
+	"wow/internal/config"
 	"wow/internal/pkg/logs"
 	"wow/internal/server"
 	"wow/internal/storage"
@@ -28,7 +29,15 @@ func main() {
 		logs.MainServerLogger.Print("can't get service port", err)
 	}
 
-	storage.Initialize("./i,robot.txt")
+	serverConfig, err := config.NewTcpServerConfiguration("./config/server/config.json")
+	if err != nil {
+		logs.MainServerLogger.Print("can't get configuration", err)
+		return
+	}
+
+	logs.MainServerLogger.Print("working with configuration", serverConfig)
+
+	storage.Initialize(serverConfig.StorageOpts.PathToBook)
 
 	s := server.Server{
 		Opts: server.ServerOpts{

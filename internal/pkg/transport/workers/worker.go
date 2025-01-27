@@ -3,7 +3,6 @@ package workers
 import (
 	"golang.org/x/sys/unix"
 
-	"wow/internal/pkg/logs"
 	"wow/internal/types"
 )
 
@@ -17,9 +16,6 @@ type Worker struct {
 }
 
 func (worker *Worker) start() {
-	logs.WorkersWorkerLogger.Print("start worker", worker.Id)
-	defer logs.WorkersWorkerLogger.Print("start worker : done", worker.Id)
-
 	var err error
 	var n int
 
@@ -39,6 +35,4 @@ func (worker *Worker) start() {
 }
 
 func (worker *Worker) stop() {
-	logs.WorkersWorkerLogger.Print("stop worker", worker.Id)
-	logs.WorkersWorkerLogger.Print("stop worker : done", worker.Id)
 }

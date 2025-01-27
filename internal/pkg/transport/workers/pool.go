@@ -1,7 +1,6 @@
 package workers
 
 import (
-	"wow/internal/pkg/logs"
 	"wow/internal/types"
 )
 
@@ -19,8 +18,6 @@ type Pool struct {
 }
 
 func New(workersNumber int, messageHandler types.TcpServerMessageHandler) (*Pool, error) {
-	logs.WorkersLogger.Print("new workers pool", workersNumber, messageHandler)
-
 	wp := &Pool{
 		WorkersNumber:  workersNumber,
 		InputGate:      make(chan PoolMessage),
@@ -49,8 +46,6 @@ func (pool *Pool) HandleMessage(targetSocketHandler int, connectionsNum int) {
 }
 
 func (pool *Pool) startWorkers() error {
-	logs.WorkersPoolLogger.Print("start workers", pool)
-
 	for idx := range pool.WorkersNumber {
 		w := &Worker{
 			Id:        idx,
@@ -65,8 +60,6 @@ func (pool *Pool) startWorkers() error {
 
 		go w.start()
 	}
-
-	logs.WorkersPoolLogger.Print("start workers : done", pool)
 
 	return nil
 }

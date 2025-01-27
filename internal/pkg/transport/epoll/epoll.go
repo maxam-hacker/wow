@@ -69,9 +69,14 @@ func (ep *Epoll) Stop() {
 func (ep *Epoll) initialize() error {
 	var err error
 
+	erContext := logger.Context{
+		"epoll": ep,
+	}
+
 	ep.epollHandler, err = unix.EpollCreate1(0)
 	if err != nil {
-		logs.EpollLogger.Print("can't create epoll", ep, err)
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't create epoll", erContext)
 		return err
 	}
 
@@ -79,37 +84,47 @@ func (ep *Epoll) initialize() error {
 
 	ep.socketHandler, err = unix.Socket(unix.AF_INET, unix.O_NONBLOCK|unix.SOCK_STREAM, 0)
 	if err != nil {
-		logs.EpollLogger.Print("can't create socket", ep, err)
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't create socket", erContext)
 		return err
 	}
 
 	err = unix.SetNonblock(ep.socketHandler, true)
 	if err != nil {
-		logs.EpollLogger.Print("can't set nonblocking socket optinon", ep, err)
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't set nonblocking socket optinon", erContext)
 		unix.Close(ep.socketHandler)
 		return err
 	}
 
 	err = unix.SetsockoptInt(ep.socketHandler, unix.IPPROTO_TCP, unix.TCP_NODELAY, 1)
 	if err != nil {
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't set no delay socket optinon", erContext)
 		unix.Close(ep.socketHandler)
 		return err
 	}
 
 	err = unix.SetsockoptInt(ep.socketHandler, unix.IPPROTO_TCP, unix.TCP_QUICKACK, 1)
 	if err != nil {
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't set quick ack socket optinon", erContext)
 		unix.Close(ep.socketHandler)
 		return err
 	}
 
 	err = unix.SetsockoptInt(ep.socketHandler, unix.SOL_SOCKET, unix.SO_REUSEADDR, 1)
 	if err != nil {
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't set reuse addr socket optinon", erContext)
 		unix.Close(ep.socketHandler)
 		return err
 	}
 
 	err = unix.SetsockoptInt(ep.socketHandler, unix.SOL_SOCKET, unix.SO_REUSEPORT, 1)
 	if err != nil {
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't set reuse port socket optinon", erContext)
 		unix.Close(ep.socketHandler)
 		return err
 	}
@@ -120,12 +135,16 @@ func (ep *Epoll) initialize() error {
 	copy(addr.Addr[:], net.ParseIP(ep.Host).To4())
 
 	if err = unix.Bind(ep.socketHandler, &addr); err != nil {
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't bind socket", erContext)
 		unix.Close(ep.socketHandler)
 		return err
 	}
 
 	err = unix.Listen(ep.socketHandler, unix.SOMAXCONN)
 	if err != nil {
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't listen socket", erContext)
 		unix.Close(ep.socketHandler)
 		return err
 	}
@@ -135,6 +154,8 @@ func (ep *Epoll) initialize() error {
 		Events: unix.EPOLLIN | unix.EPOLLHUP | unix.EPOLLRDHUP | unix.EPOLLET | unix.EPOLLERR,
 	})
 	if err != nil {
+		erContext["error"] = err
+		logs.EpollLogger.PrintWithContext("can't add socket in epoll", erContext)
 		return err
 	}
 
@@ -186,23 +207,30 @@ func (ep *Epoll) loop() {
 }
 
 func (ep *Epoll) accept() error {
+	erContext := logger.Context{}
+
 	for {
 		acceptedSocketHandler, _, err := unix.Accept(ep.socketHandler)
 		if err != nil {
 			return err
 		}
 
+		erContext["epoll"] = ep
+		erContext["acceptedSocketHandler"] = acceptedSocketHandler
+
 		ep.metrics.IncConnections(acceptedSocketHandler)
 
 		err = unix.SetNonblock(acceptedSocketHandler, true)
 		if err != nil {
-			logs.EpollLogger.Print("can't set nonblocking option to accepted socket", ep, acceptedSocketHandler, err)
+			erContext["error"] = err
+			logs.EpollLogger.PrintWithContext("can't set nonblocking option to accepted socket", erContext)
 			return err
 		}
 
 		err = unix.SetsockoptInt(acceptedSocketHandler, unix.SOL_SOCKET, unix.SO_KEEPALIVE, 0)
 		if err != nil {
-			logs.EpollLogger.Print("can't set keep alive option to accepted socket", ep, acceptedSocketHandler, err)
+			erContext["error"] = err
+			logs.EpollLogger.PrintWithContext("can't set keep alive option to accepted socket", erContext)
 			return err
 		}
 
@@ -211,7 +239,8 @@ func (ep *Epoll) accept() error {
 			Fd:     int32(acceptedSocketHandler),
 		})
 		if err != nil {
-			logs.EpollLogger.Print("can't add accepted socket in epoll", ep, acceptedSocketHandler, err)
+			erContext["error"] = err
+			logs.EpollLogger.PrintWithContext("can't add accepted socket in epoll", erContext)
 			return err
 		}
 

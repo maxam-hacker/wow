@@ -7,6 +7,7 @@ import (
 
 	"wow/internal/pkg/logs"
 	"wow/internal/pkg/transport"
+	"wow/internal/pkg/transport/epoll"
 	"wow/internal/proto"
 	"wow/internal/storage"
 	"wow/pkg/logger"
@@ -24,6 +25,7 @@ type Server struct {
 	WorkLoadBalancer func(int) (int16, error)
 	tcpServer        transport.TcpServer
 	Opts             ServerOpts
+	EpollOpts        epoll.EpollOpts
 }
 
 var (
@@ -42,7 +44,7 @@ func (server *Server) Start() error {
 		MessageHandler: server.messageHandler,
 	}
 
-	return server.tcpServer.Start()
+	return server.tcpServer.Start(server.EpollOpts)
 }
 
 func (server *Server) Stop() {

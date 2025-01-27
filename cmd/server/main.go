@@ -33,7 +33,7 @@ func main() {
 		logs.MainServerLogger.Print("can't get service port", err)
 	}
 
-	serverConfig, err := config.NewTcpServerConfiguration(*configPath)
+	serverConfig, err := config.NewServerConfiguration(*configPath)
 	if err != nil {
 		logs.MainServerLogger.Print("can't get configuration", err)
 		return
@@ -47,24 +47,25 @@ func main() {
 		Opts: server.ServerOpts{
 			Host:                serviceHost,
 			Port:                servicePort,
-			Workres:             10,
-			CloseAfterAction:    false,
-			CloseAfterExecution: false,
+			Workres:             serverConfig.ServerOpts.Workres,
+			CloseAfterAction:    serverConfig.ServerOpts.CloseAfterAction,
+			CloseAfterExecution: serverConfig.ServerOpts.CloseAfterExecution,
 		},
+		EpollOpts: serverConfig.EpollOpts,
 		WorkLoadBalancer: func(currentWorkLoad int) (int16, error) {
-			if currentWorkLoad > 1000000 {
-				return 4, nil
+			if currentWorkLoad > serverConfig.WorkLoadBalancerOpts.Threshold3Connections {
+				return int16(serverConfig.WorkLoadBalancerOpts.Threshold3Zeros), nil
 			}
 
-			if currentWorkLoad > 10000 {
-				return 3, nil
+			if currentWorkLoad > serverConfig.WorkLoadBalancerOpts.Threshold2Connections {
+				return int16(serverConfig.WorkLoadBalancerOpts.Threshold2Zeros), nil
 			}
 
-			if currentWorkLoad > 1000 {
-				return 2, nil
+			if currentWorkLoad > serverConfig.WorkLoadBalancerOpts.Threshold1Connections {
+				return int16(serverConfig.WorkLoadBalancerOpts.Threshold1Zeros), nil
 			}
 
-			return 1, nil
+			return int16(serverConfig.WorkLoadBalancerOpts.MinZeros), nil
 		},
 	}
 

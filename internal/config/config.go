@@ -16,7 +16,7 @@ type TcpServerConfiguration struct {
 	WorkLoadBalancerOpts types.WorkLoadBalancerOpts `json:"workLoadBalancer"`
 }
 
-func NewTcpServerConfiguration(configPath string) (*TcpServerConfiguration, error) {
+func NewServerConfiguration(configPath string) (*TcpServerConfiguration, error) {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return nil, err

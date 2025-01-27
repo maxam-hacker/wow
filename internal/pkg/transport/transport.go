@@ -26,7 +26,7 @@ type TcpServer struct {
 	workers        *workers.Pool
 }
 
-func (tcpServer *TcpServer) Start() error {
+func (tcpServer *TcpServer) Start(epollOpts epoll.EpollOpts) error {
 	var err error
 
 	if tcpServer.WorkersNumber == 0 {
@@ -40,14 +40,6 @@ func (tcpServer *TcpServer) Start() error {
 	tcpServer.workers, err = workers.New(tcpServer.WorkersNumber, tcpServer.MessageHandler)
 	if err != nil {
 		return err
-	}
-
-	epollOpts := epoll.EpollOpts{
-		EpollEventsBufferSize:       epoll.DefaultEpollEventsBufferSize,
-		EpollLoopWaitTimeout:        epoll.DefaultEpollLoopWaitTimeout,
-		CleanerPeriod:               epoll.DefaultCleanerPeriod,
-		CleanerConnectionsThreshold: epoll.DefaultCleanerConnectionsThreshold,
-		CleanerTimeThreshold:        epoll.DefaultCleanerTimeThreshold,
 	}
 
 	tcpServer.epoll, err = epoll.New(tcpServer.Host, tcpServer.Port, tcpServer.workers, epollOpts)

@@ -34,3 +34,6 @@ services:
     depends_on:
       - server
       - client
+    deploy:
+      replicas: 1
+    

@@ -1,27 +1,27 @@
-# "Word Of Wisdom" test case
+## "Word Of Wisdom" test case
 
-# Build and start
+### Build and start
 
-docker compose build
+`docker compose build`
 
-docker compose up server
+`docker compose up server`
 
-docker compose up client
+`docker compose up client`
 
-docker compose up tester
+`docker compose up tester`
 
-# Implementation details
+## Implementation details
 
-## Transport
+### Transport
 
-It is used `epoll` functionality for the server implementation.
+It is used `epoll` functionality for the server implementation and memory optimization approach to handle messages.
 
-## Prof Of Work
+### Prof Of Work
 
 The project uses Hashcash algorith as PoW.
 It is simple for understanding, implementation for the client and verification for the server.
 
-## How to improve the project
+### How to improve the project
 
 Use a database as a storage of the book content.
 

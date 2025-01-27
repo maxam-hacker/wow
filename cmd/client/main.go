@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"os"
 	"os/signal"
 	"strconv"
@@ -32,6 +33,10 @@ type Client struct {
 }
 
 func main() {
+	maxLines := flag.Int("maxlines", 6, "max lines to read")
+	startLine := flag.Int("startline", 1, "start line to read")
+	flag.Parse()
+
 	serviceHost := os.Getenv("SERVICE_HOST")
 	if serviceHost == "" {
 		serviceHost = "127.0.0.1"
@@ -49,8 +54,8 @@ func main() {
 	c := &Client{
 		Id:          uuid.NewString(),
 		Version:     Version,
-		MaxLines:    6,
-		lineCounter: 1,
+		MaxLines:    *maxLines,
+		lineCounter: *startLine,
 		tcpClient: client.TcpClient{
 			Host: serviceHost,
 			Port: servicePort,

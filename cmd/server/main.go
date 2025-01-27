@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"os/signal"
 	"strconv"
@@ -14,6 +15,9 @@ import (
 
 func main() {
 	logs.MainServerLogger.Print("start")
+
+	configPath := flag.String("config", "./config/server/config.json", "configuration file path")
+	flag.Parse()
 
 	serviceHost := os.Getenv("SERVICE_HOST")
 	if serviceHost == "" {
@@ -29,7 +33,7 @@ func main() {
 		logs.MainServerLogger.Print("can't get service port", err)
 	}
 
-	serverConfig, err := config.NewTcpServerConfiguration("./config/server/config.json")
+	serverConfig, err := config.NewTcpServerConfiguration(*configPath)
 	if err != nil {
 		logs.MainServerLogger.Print("can't get configuration", err)
 		return

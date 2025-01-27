@@ -4,11 +4,10 @@ WORKDIR /build
 
 COPY . .
 
-RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main ./cmd/server
+RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main ./cmd/tester
 
 FROM alpine:3.18.2
 
 COPY --from=builder /build/main /
-COPY --from=builder /build/config/tester/config.json /config/config.json
 
 ENTRYPOINT ["/main"]

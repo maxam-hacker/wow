@@ -7,6 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestOnNewResponse(t *testing.T) {
+	responseOnAction := NewResponseOnAction(10)
+	assert.NotEqual(t, 0, responseOnAction.Hash.Counter)
+	assert.NotEqual(t, "", responseOnAction.Hash.Rand)
+}
+
 func TestOnValidation(t *testing.T) {
 	hc, err := hashcash.Hashcash{
 		Version:  1,

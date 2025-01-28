@@ -1,7 +1,9 @@
 package proto
 
 import (
+	"crypto/rand"
 	"errors"
+	"math/big"
 	"time"
 	"wow/internal/hashcash"
 )
@@ -58,12 +60,24 @@ func NewRequestActionExecution(meta ClientMeta, lineId int, hash hashcash.Hashca
 }
 
 func NewResponseOnAction(workLoadFactor int16) Response {
+	var randBytes [32]byte
+
+	n, _ := rand.Read(randBytes[:])
+
+	c, err := rand.Int(rand.Reader, big.NewInt(100))
+	if err != nil {
+		c = big.NewInt(1)
+	}
+
 	return Response{
 		Type: ResponseOnActionType,
 		Hash: hashcash.Hashcash{
-			Version: 1,
-			Zeros:   int(workLoadFactor),
-			Date:    time.Now().UTC().Unix(),
+			Version:  1,
+			Zeros:    int(workLoadFactor),
+			Date:     time.Now().UTC().Unix(),
+			Resource: "action-execute",
+			Rand:     string(randBytes[:n]),
+			Counter:  int(c.Int64()),
 		},
 	}
 }

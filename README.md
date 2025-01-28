@@ -16,7 +16,7 @@
 
 It is used `epoll` functionality for the server implementation and memory optimization approach to handle messages.
 
-### Prof Of Work
+### Proof Of Work
 
 The project uses Hashcash algorith as PoW.
 It is simple for understanding, implementation for the client and verification for the server and hard to brutforce.
@@ -36,7 +36,7 @@ More unit and integration tests.
 
 ### Results
 
-Cliet:
+Client:
 ![alt text](docs/images/client.png?raw=true)
 
 Server:

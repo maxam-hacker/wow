@@ -31,6 +31,7 @@ More metcis and control algorithms based on it.
 
 More unit and integration tests.
 
+`json.Marshal` is not optimize in relation to memory consumption in that case... need to think it through.
 
 ### Results
 

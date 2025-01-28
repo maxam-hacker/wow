@@ -20,7 +20,7 @@ It is used `epoll` functionality for the server implementation and memory optimi
 
 The project uses Hashcash algorith as PoW.
 It is simple for understanding, implementation for the client and verification for the server and hard to brutforce.
-But it depends on calculation abilities of hardware.
+But the algo depends on calculation abilities of hardware.
 
 ### How to improve the project
 
